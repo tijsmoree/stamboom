@@ -1,0 +1,93 @@
+<div class="container">
+  <div class="page-header">
+    <h2>Logs</h2>
+  </div>
+
+  <div class="input-group">
+    <input [(ngModel)]="searchFilter" class="form-control" placeholder="Zoek log..." (ngModelChange)="searchLogs($event)">
+    <div class="input-group-append">
+      <button type="button" class="btn btn-outline-secondary btn-form" (click)='searchReset()'>
+        <span class="fa fa-times"></span>
+      </button>
+    </div>
+  </div>
+  <div class="btn-group d-none d-sm-flex">
+    <div class="btn btn-outline-secondary w-100" [ngClass]="{'active': (cudFilter == Cud.C)}" (click)="setFilter(Cud.C)">
+      <span class='fa fa-plus'></span> Aanmaaklogs
+    </div>
+    <div class="btn btn-outline-secondary w-100" [ngClass]="{'active': (cudFilter == Cud.U)}" (click)="setFilter(Cud.U)">
+      <span class='fa fa-pencil'></span> Wijzigingslogs
+    </div>
+    <div class="btn btn-outline-secondary w-100" [ngClass]="{'active': (cudFilter == Cud.D)}" (click)="setFilter(Cud.D)">
+      <span class='fa fa-times'></span> Verwijderlogs
+    </div>
+  </div>
+  <div class="container text-center" *ngIf="!amountLogs">
+    <p>Er zijn geen logs gevonden!</p>
+  </div>
+  <ng-template [ngIf]="amountLogs">
+    <div *ngFor="let log of logs">
+      <div class="card">
+        <div role="button" class="card-header" (click)="log.open = !log.open" style="cursor: pointer;">
+          <div class="float-right">
+            {{log.displayTime}}
+          </div>
+          <div class="float-left" style="margin-right: 10px">
+            <span *ngIf="log.change_type == 'create'" class='fa fa-plus'></span>
+            <span *ngIf="log.change_type == 'update'" class='fa fa-pencil'></span>
+            <span *ngIf="log.change_type == 'delete'" class='fa fa-times'></span>
+          </div>
+          {{log.message}}
+        </div>
+        <div class="card-body" *ngIf="log.open">
+          <div class="btn-group float-right">
+            <a *ngFor="let link of log.links"
+              href="#/{{link.link}}"
+              class="btn btn-outline-secondary">
+              <span class='fa fa-tag'></span> {{link.name}}
+            </a>
+            <button (click)='revert(log)'
+              class="btn btn-outline-secondary"
+              [ngClass]="{'disabled': (!log.revertable)}">
+              <span class='fa fa-undo'></span> Draai terug
+            </button>
+          </div>
+        </div>
+        <table class="table" *ngIf="log.open">
+          <thead>
+          <tr>
+            <th>Attribuut</th>
+            <th *ngIf="log.change_type != 'create'">Oude waarde</th>
+            <th *ngIf="log.change_type != 'delete'">Nieuwe waarde</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor='let attribute of log.changes'>
+            <td>
+              {{attribute.key}}
+            </td>
+            <td *ngIf="log.change_type != 'create'">
+              {{attribute.old}}
+            </td>
+            <td *ngIf="log.change_type != 'delete'">
+              {{attribute.new}}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-template>
+
+  <ul *ngIf="pages && amountLogs" class="pagination mx-auto justify-content-center">
+    <li class="page-item" [ngClass]="{disabled:currentPage === 1}">
+      <a class="page-link" (click)="loadPage(currentPage - 1)">&laquo;</a>
+    </li>
+    <li class="page-item d-none d-sm-block" *ngFor="let page of pages" [ngClass]="{active: currentPage === page}">
+      <a class="page-link" (click)="loadPage(page)">{{page}}</a>
+    </li>         
+    <li class="page-item" [ngClass]="{disabled:currentPage === totalPages}">
+      <a class="page-link" (click)="loadPage(currentPage + 1)">&raquo;</a>
+    </li>
+  </ul>
+</div>

@@ -1,0 +1,56 @@
+<div class="container">
+    <div class="page-header">
+        <h2>Profiel</h2>
+    </div>
+</div>
+
+<form #profileForm="ngForm" class="form-horizontal">
+  <div class="container margin-bottom">
+    <input class="btn btn-big btn-outline-success" style="margin-right: 15px;" (click)="profileSave()" [disabled]="(!profileForm.form.dirty)"
+           type="submit" value="Sla op">
+  </div>
+
+  <div class="container" *ngIf="profile">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            Gebruiker
+          </div>
+          <table class="table">
+            <tbody>
+            <tr>
+              <td style="border: 0;"><label>Naam</label></td>
+              <td style="border: 0;">{{profile.person.name()}}</td>
+            </tr>
+            <tr>
+              <td style="border: 0;"><label>Mail</label></td>
+              <td style="border: 0;"><input type='text' [(ngModel)]='profile.mail' name='mail' class='form-control'/></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              Wachtwoord
+            </div>
+            <table class="table">
+              <tbody>
+              <tr>
+                <td style="border: 0;"><label>Wachtwoord</label></td>
+                <td style="border: 0;"><input type='password' [(ngModel)]='profile.password' name='newPassword' class='form-control'/></td>
+              </tr>
+              <tr>
+                <td><label>Herhalen</label></td>
+                <td><input type='password' [(ngModel)]='profile.repeat' name='newPasswordRepeat' class='form-control'/></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+  </div>
+</form>

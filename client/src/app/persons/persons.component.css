@@ -1,0 +1,15 @@
+.small-select {
+  margin: -1px;
+}
+
+.btn-form {
+  border-color: #ced4da;
+}
+
+.btn-group {
+  margin-right: 25px;
+}
+
+.list-group-item-action {
+  cursor: pointer;
+}

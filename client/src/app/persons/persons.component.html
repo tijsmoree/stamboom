@@ -1,0 +1,81 @@
+<div class="container">
+    <div class="page-header">
+        <h2>Personen<small *ngIf="subTitle">&nbsp;&raquo; {{subTitle}}</small></h2>
+    </div>
+</div>
+
+<div class="container">
+  <div class="page-content">
+    <ng-select [items]="people"
+      (change)="personSelect($event)"
+      placeholder="Zoeken"
+      [clearable]="false"
+      [searchFn]="searchPerson">
+      <ng-template ng-label-tmp let-item="item">
+        {{utils.name(item)}}
+      </ng-template>
+      <ng-template ng-option-tmp let-item="item">
+        <span class="fa" [ngClass]="{'fa-mars': (item.sex === 'm'), 'fa-venus': (item.sex === 'f'), 'fa-genderless': (item.sex === 'u')}"></span> {{utils.name(item)}}
+      </ng-template>
+    </ng-select>
+  </div>
+</div>
+
+<form #personForm="ngForm" class="form-horizontal">
+  <div class="container margin-bottom">
+    <input class="btn btn-big btn-outline-success" style="margin-right: 15px;" (click)="personSave()" [disabled]="(!person || !personForm.form.dirty)"
+           type="submit" value="Sla op">
+    <button type="button" class="btn btn-big btn-outline-danger" (click)="personDelete()" [disabled]="!person">
+      Verwijder
+    </button>
+
+    <button class="btn btn-big btn-outline-primary float-right" (click)="newPerson()" [disabled]="personForm.form.dirty">Nieuw persoon</button>
+  </div>
+  <div class="container text-center" *ngIf="!person">
+    <p>Zoek naar een persoon hierboven!</p>
+  </div>
+
+  <div class="container" *ngIf="person">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            Persoon
+          </div>
+          <table class="table">
+            <tbody>
+            <tr>
+              <td style="border: 0;"><label>Naam</label></td>
+              <td style="border: 0;"><input type='text' [(ngModel)]='person.name' name='name' class='form-control'/></td>
+            </tr>
+            <tr>
+              <td><label>Geslacht</label></td>
+              <td>
+                <div class="row">
+                  <div class="col-6">
+                    <label class="radio-inline">
+                      <input type="radio" [(ngModel)]='person.is_man' name='is_man' [value]="1"> Man
+                    </label>
+                  </div>
+                  <div class="col-6">
+                    <label class="radio-inline">
+                      <input type="radio" [(ngModel)]='person.is_man' name='is_man' [value]="0"> Vrouw
+                    </label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            Commentaar
+          </div>
+          <textarea class="form-control form-comments" [(ngModel)]="person.comments" name="comments"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

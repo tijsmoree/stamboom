@@ -1,0 +1,125 @@
+<div class="container">
+    <div class="page-header">
+        <h2>Gebruikers<small *ngIf="subTitle">&nbsp;&raquo; {{subTitle}}</small></h2>
+    </div>
+</div>
+
+<div class="container">
+  <div class="page-content">
+    <ng-select [items]="users"
+      (change)="userSelect($event)"
+      placeholder="Zoeken"
+      [clearable]="false"
+      [searchFn]="searchUser">
+      <ng-template ng-label-tmp let-item="item">
+        {{utils.name(item.person)}}
+      </ng-template>
+      <ng-template ng-option-tmp let-item="item">
+        <span [ngStyle]="{'font-weight': item.admin ? 'bold' : 'normal'}">
+          {{utils.name(item.person)}}
+        </span>
+      </ng-template>
+    </ng-select>
+  </div>
+</div>
+
+<form #userForm="ngForm" class="form-horizontal">
+  <div class="container margin-bottom">
+    <input class="btn btn-big btn-outline-success" style="margin-right: 15px;" (click)="userSave()" [disabled]="(!user || !userForm.form.dirty)"
+           type="submit" value="Sla op">
+    <button type="button" class="btn btn-big btn-outline-danger" (click)="userDelete()" [disabled]="!user">
+      Verwijder
+    </button>
+
+    <button class="btn btn-big btn-outline-primary float-right" (click)="newUser()" [disabled]="userForm.form.dirty">Nieuwe gebruiker</button>
+  </div>
+  <div class="container text-center" *ngIf="!user">
+    <p>Zoek naar een gebruiker hierboven!</p>
+  </div>
+
+  <div class="container" *ngIf="user">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            Gebruiker
+          </div>
+          <table class="table">
+            <tbody>
+            <tr>
+              <td style="border: 0;"><label>Mail</label></td>
+              <td style="border: 0;"><input type='text' [(ngModel)]='user.mail' name='mail' class='form-control'/></td>
+            </tr>
+            <tr>
+              <td><label>Persoon</label></td>
+              <td>
+                <ng-select [items]="people"
+                  *ngIf="people"
+                  [(ngModel)]="user.person"
+                  name="person"
+                  bindLabel="name"
+                  placeholder="Persoon"
+                  [clearable]="false"
+                  class="small-select">
+                </ng-select>
+              </td>
+            </tr>
+            <tr>
+              <td><label>Admin</label></td>
+              <td>
+                <div class="row">
+                  <div class="col-6">
+                    <label class="radio-inline">
+                      <input type="radio" [(ngModel)]='user.admin' name='admin' [value]="1"> Ja
+                    </label>
+                  </div>
+                  <div class="col-6">
+                    <label class="radio-inline">
+                      <input type="radio" [(ngModel)]='user.admin' name='admin' [value]="0"> Nee
+                    </label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="user.attempts">
+              <td><label>Pogingen</label></td>
+              <td>
+                <div class="float-right">
+                  <button (click)="user.attempts = 0; form.control.markAsDirty()" class="btn btn-outline-secondary btn-form" type="button">
+                    <span class="fa fa-unlock"></span>
+                  </button>
+                </div>
+                {{user.attempts}} / 5
+              </td>
+            </tr>
+            <tr *ngIf="user.logged_at">
+              <td><label>Laatste login</label></td>
+              <td>{{user.logged_at | date : 'medium' }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              Wachtwoord
+            </div>
+            <table class="table">
+              <tbody>
+              <tr>
+                <td style="border: 0;"><label>Wachtwoord</label></td>
+                <td style="border: 0;"><input type='password' [(ngModel)]='user.password' name='newPassword' class='form-control'/></td>
+              </tr>
+              <tr>
+                <td><label>Herhalen</label></td>
+                <td><input type='password' [(ngModel)]='user.repeat' name='newPasswordRepeat' class='form-control'/></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+  </div>
+</form>

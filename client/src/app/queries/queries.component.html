@@ -1,0 +1,59 @@
+<div class="container">
+    <div class="page-header">
+        <h2>Queries</h2>
+    </div>
+</div>
+
+<div class="container">
+  <div class="row" style="margin-bottom: 50px;">
+    <div class="page-content col-md-8">
+      <form name="queryForm">
+        <div class="form-group" style="border: 1px #ddd solid;">
+          <ngx-codemirror [config]="codeMirror" [(ngModel)]="query" name="query" (keypress)="ctrlQ($event)"></ngx-codemirror>
+        </div>
+        <div class="btn-toolbar">
+          <button type="button" class="btn btn-outline-success" (click)="try()">
+            Uitvoeren
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-4 d-none d-md-block">
+      <div *ngFor="let table of info" class="card" style="margin-bottom: -2px;">
+        <a class="card-header" data-toggle="collapse" href="#collapse-{{table.name}}" style="color: inherit;">
+          {{table.name}}
+        </a>
+        <div class="card-body collapse" style="padding:0 10px;" id="collapse-{{table.name}}">
+          <div style="margin: 10px 0 16px;">
+            <div class="row no-margin" *ngFor="let column of table.columns" [ngClass]="{'bold text-danger': (column.Key == 'PRI'), 'bold text-info': (column.Key == 'MUL')}">
+              <div class="col-6">{{column.Field}}</div>
+              <div class="col-6"><i>{{column.Type}}</i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+</div>
+
+
+<div class="container-fluid" *ngIf="results && results.resultExpected === true && results.data.length" style="padding: 0;">
+  <div class="page-content" style="font-size: 85%">
+    <div class="table-responsive">
+      <table class="table table-condensed table-striped">
+        <thead>
+          <tr>
+            <th *ngFor="let column of results.columns">{{column}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of results.data">
+            <td *ngFor="let column of results.columns">{{row[column]}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

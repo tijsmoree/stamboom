@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light" [hidden]="page == 'login'">
+  <div class="container px-0 px-sm-3">
+    <a class="navbar-brand" href="/#/">
+      Stamboom
+    </a>
+
+    <button class="navbar-toggler" type="button" (click)="toggleNavbar()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" [ngClass]="{'show': navbarOpen}">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item" [ngClass]="{'active': page == 'person'}">
+          <a class="nav-link" routerLink="/persons">Personen</a>
+        </li>
+        <li class="nav-item" [ngClass]="{'active': page == 'user'}">
+          <a class="nav-link" routerLink="/users" [hidden]="!nav.admin">Gebruikers</a>
+        </li>
+        <li class="nav-item" [ngClass]="{'active': page == 'querie'}">
+          <a class="nav-link" routerLink="/queries" [hidden]="!nav.admin">Queries</a>
+        </li>
+        <li class="nav-item" [ngClass]="{'active': page == 'log'}">
+          <a class="nav-link" routerLink="/logs" [hidden]="!nav.admin">Logs</a>
+        </li>
+        <li class="nav-item d-block d-lg-none" [ngClass]="{'active': page == 'profile'}">
+          <a class="nav-link" routerLink="/profile">Profiel</a>
+        </li>
+      </ul>
+
+      <span class="navbar-text d-none d-lg-block">
+        <a class="nav-link" routerLink="/profile" style="padding: 0;">{{nav.name}}</a>
+      </span>
+      <a class="btn btn-outline-secondary float-right" (click)="logout()">Uitloggen</a>
+    </div>
+  </div>
+</nav>
