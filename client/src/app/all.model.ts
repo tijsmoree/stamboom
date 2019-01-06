@@ -1,8 +1,7 @@
 export interface Person {
-  id: number;
+  id?: number;
   first_name?: string;
   nickname?: string;
-  prefix?: string;
   last_name?: string;
   sex?: 'm' | 'f' | 'u';
   birth?: Moment;
@@ -10,18 +9,18 @@ export interface Person {
   father?: Person;
   mother?: Person;
   children?: Person[];
-  marriage?: Marriage;
+  marriages?: Marriage[];
 }
 
 export interface Moment {
-  id: number;
+  id?: number;
   date?: string;
   location?: Location;
   source?: string;
 }
 
 export interface Location {
-  id: number;
+  id?: number;
   name?: string;
   state?: string;
   country?: string;
@@ -30,9 +29,8 @@ export interface Location {
 }
 
 export interface Marriage {
-  id: number;
-  male?: Person;
-  female?: Person;
+  id?: number;
+  spouse?: Person;
   marriage?: Moment;
   divorce?: Moment;
 }

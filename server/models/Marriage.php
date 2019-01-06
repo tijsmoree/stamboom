@@ -10,8 +10,6 @@ use yii\db\Expression;
 /**
  * This is the model class for table "stamboom.marriages".
  * @property integer $id
- * @property integer $male_id
- * @property integer $female_id
  * @property integer $marriage_id
  * @property integer $divorce_id
  * @property string $created_at
@@ -41,12 +39,24 @@ class Marriage extends ActiveRecord {
     return parent::beforeSave($insert);
   }
 
-  public function getMale() {
-    return $this->hasOne(Person::className(), ['id' => 'male_id']);
+  public function beforeDelete() {
+    if (!parent::beforeDelete()) {
+      return false;
+    }
+
+    foreach ($this->spouses as $spouse) {
+      $spouse->delete();
+    }
+    
+    return true;
   }
 
-  public function getFemale() {
-    return $this->hasOne(Person::className(), ['id' => 'female_id']);
+  public function getSpouses() {
+    return $this->hasMany(Spouse::className(), ['marriage_id' => 'id']);
+  }
+
+  public function getPeople() {
+    return $this->hasMany(Person::className(), ['id' => 'person_id'])->viaTable('spouses', ['marriage_id' => 'id']);
   }
 
   public function getMarriage() {
@@ -57,13 +67,14 @@ class Marriage extends ActiveRecord {
     return $this->hasOne(Moment::className(), ['id' => 'divorce_id']);
   }
 
-  public function getViewAttributes() {
+  public function getViewAttributes($person_id) {
     $result = $this->getAttributes([
       'id'
     ]);
 
-    $result['male'] = $this->male ? $this->male->simpleAttributes : null;
-    $result['female'] = $this->female ? $this->female->simpleAttributes : null;
+    $result['spouse'] = array_values(array_filter($this->people, function ($p) use ($person_id) {
+      return $p->id !== $person_id;
+    }))[0]->simpleAttributes ?? null;
 
     $result['marriage'] = $this->marriage ? $this->marriage->viewAttributes : null;
     $result['divorce'] = $this->divorce ? $this->divorce->viewAttributes : null;

@@ -13,7 +13,6 @@ use yii\db\Expression;
  * @property integer $id
  * @property string $first_name
  * @property string $nickname
- * @property string $prefix
  * @property string $last_name
  * @property string $sex
  * @property integer $birth_id
@@ -45,9 +44,10 @@ class Person extends ActiveRecord {
   public function beforeSave($insert) {
     $this->first_name = $this->first_name ?? '';
     $this->nickname = $this->nickname ?? '';
-    $this->prefix = $this->prefix ?? '';
     $this->last_name = $this->last_name ?? '';
     $this->comments = $this->comments ?? '';
+
+    // throw new \yii\web\HttpException(400, json_encode($this->birth));
     
     return parent::beforeSave($insert);
   }
@@ -59,14 +59,16 @@ class Person extends ActiveRecord {
 
     if ($this->birth) $this->birth->delete();
     if ($this->death) $this->death->delete();
-    if ($this->marriage) $this->marriage->delete();
+    foreach ($this->marriages as $marriage) {
+      $marriage->delete();
+    }
     
     return true;
   }
 
   public function rules() {
     return [
-      [['first_name', 'nickname', 'prefix', 'last_name', 'comments'], 'string'],
+      [['first_name', 'nickname', 'last_name', 'comments'], 'string'],
       ['sex', 'in', 'range' => ['m', 'f', 'u']]
     ];
   }
@@ -87,9 +89,8 @@ class Person extends ActiveRecord {
     return $this->hasOne(Moment::className(), ['id' => 'death_id']);
   }
 
-  public function getMarriage() {
-    return $this->hasOne(Marriage::className(), [($this->sex == 'm' ? 'male_id' : 'female_id') => 'id']) ??
-           $this->hasOne(Marriage::className(), [($this->sex == 'm' ? 'female_id' : 'male_id') => 'id']);
+  public function getMarriages() {
+    return $this->hasMany(Marriage::className(), ['id' => 'marriage_id'])->viaTable('spouses', ['person_id' => 'id']);
   }
 
   public function getChildren() {
@@ -111,9 +112,8 @@ class Person extends ActiveRecord {
 
   public function getName() {
     $first = $this->nickname ? $this->nickname : $this->first_name;
-    $last = $this->prefix ? $this->prefix . ' ' . $this->last_name : $this->last_name;
     
-    return trim($first . ' ' . $last);
+    return trim($first . ' ' . $this->last_name);
   }
 
   public function getViewAttributes() {
@@ -121,7 +121,6 @@ class Person extends ActiveRecord {
       'id',
       'first_name',
       'nickname',
-      'prefix',
       'last_name',
       'sex',
       'comments'
@@ -133,7 +132,10 @@ class Person extends ActiveRecord {
     $result['father'] = $this->father ? $this->father->simpleAttributes : null;
     $result['mother'] = $this->mother ? $this->mother->simpleAttributes : null;
 
-    $result['marriage'] = $this->marriage ? $this->marriage->viewAttributes : null;
+    $person_id = $this->id;
+    $result['marriages'] = array_map(function ($m) use ($person_id) {
+      return $m->getViewAttributes($person_id);
+    }, $this->marriages);
 
     $result['children'] = array_map(function ($p) {
       return $p->simpleAttributes;
@@ -147,7 +149,6 @@ class Person extends ActiveRecord {
       'id',
       'first_name',
       'nickname',
-      'prefix',
       'last_name',
       'sex'
     ]);

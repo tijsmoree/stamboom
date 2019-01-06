@@ -9,7 +9,6 @@ class m181209_011534_init extends Migration {
       'id'          => $this->primaryKey(),
       'first_name'  => $this->string(100)->notNull(),
       'nickname'    => $this->string(100)->notNull(),
-      'prefix'      => $this->string(100)->notNull(),
       'last_name'   => $this->string(100)->notNull(),
       'sex'         => "ENUM('m', 'f', 'u')",
       'birth_id'    => $this->integer(11),
@@ -43,13 +42,22 @@ class m181209_011534_init extends Migration {
 
     $this->createTable('marriages', [
       'id'          => $this->primaryKey(),
-      'male_id'     => $this->integer(11)->notNull(),
-      'female_id'   => $this->integer(11)->notNull(),
       'marriage_id' => $this->integer(11),
       'divorce_id'  => $this->integer(11),
       'created_at'  => $this->dateTime()->null(),
       'updated_at'  => $this->dateTime()->null()
     ]);
+
+    $this->createTable('spouses', [
+      'person_id'   => $this->integer(11)->notNull(),
+      'marriage_id' => $this->integer(11)->notNull(),
+      'created_at'  => $this->dateTime()->null(),
+      'updated_at'  => $this->dateTime()->null()
+    ]);
+    $this->addPrimaryKey("PRIMARY_spouses",
+      "spouses",
+      ["person_id", "marriage_id"]
+    );
 
     $this->createTable('users', [
       'id'          => $this->primaryKey(),
@@ -75,71 +83,78 @@ class m181209_011534_init extends Migration {
     ]);
 
     $this->addForeignKey('person_has_birth',
-      'persons',
-      'birth_id',
+      'persons', 'birth_id',
       'moments', 'id',
       'RESTRICT', 'RESTRICT'
     );
     $this->addForeignKey('person_has_death',
-      'persons',
-      'death_id',
+      'persons', 'death_id',
       'moments', 'id',
       'RESTRICT', 'RESTRICT'
     );
 
     $this->addForeignKey('moment_has_location',
-      'moments',
-      'location_id',
+      'moments', 'location_id',
       'locations', 'id',
       'RESTRICT', 'RESTRICT'
     );
 
-    $this->addForeignKey('marriage_has_male',
-      'marriages',
-      'male_id',
+    $this->addForeignKey('spouse_has_person',
+      'spouses', 'person_id',
       'persons', 'id',
       'RESTRICT', 'RESTRICT'
     );
-    $this->addForeignKey('marriage_has_female',
-      'marriages',
-      'female_id',
-      'persons', 'id',
+    $this->addForeignKey('spouse_has_marriage',
+      'spouses', 'marriage_id',
+      'marriages', 'id',
       'RESTRICT', 'RESTRICT'
     );
+
     $this->addForeignKey('marriage_has_marriage',
-      'marriages',
-      'marriage_id',
+      'marriages', 'marriage_id',
       'moments', 'id',
       'RESTRICT', 'RESTRICT'
     );
     $this->addForeignKey('marriage_has_divorce',
-      'marriages',
-      'divorce_id',
+      'marriages', 'divorce_id',
       'moments', 'id',
       'RESTRICT', 'RESTRICT'
     );
 
     $this->addForeignKey('user_has_person',
-      'users',
-      'person_id',
+      'users', 'person_id',
       'persons', 'id',
       'RESTRICT', 'RESTRICT'
     );
 
     $this->addForeignKey('log_has_user',
-      'logs',
-      'user_id',
+      'logs', 'user_id',
       'users', 'id',
       'RESTRICT', 'RESTRICT'
     );
+
+    $this->insert('persons', [
+      'id'         => 1,
+      'first_name' => 'Tijs',
+      'nickname'   => '',
+      'last_name'  => 'Moree',
+      'sex'        => 'm'
+    ]);
+    $this->insert('users', [
+      'person_id'  => 1,
+      'mail'       => 'tijsmoree@gmail.com',
+      'password'   => '$2y$13$1eXMwZ6xKHzfGKiTv0ZVju/pqTcsQUTT/S8uvpx2VnZ5Y/3Ph1pPe',
+      'admin'      => 1
+    ]);
   }
 
   public function down() {
+    $this->dropTable('spouses');
     $this->dropTable('marriages');
-    $this->dropTable('locations');
-    $this->dropTable('moments');
     $this->dropTable('logs');
     $this->dropTable('users');
     $this->dropTable('persons');
+    $this->dropTable('moments');
+    $this->dropTable('locations');
   }
 }

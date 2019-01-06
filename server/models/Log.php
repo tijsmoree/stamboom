@@ -123,7 +123,7 @@ class Log extends ActiveRecord {
         }
         break;
       case 'Moment':
-        $person = $this->getObject()->owner;
+        $person = $this->getObject()->owner ?? null;
         if ($person) {
           $message = 'Een gebeurtenis van ' . $person->name;
         } else {
@@ -147,8 +147,8 @@ class Log extends ActiveRecord {
         }
         break;
       case 'Marriage':
-        $person_1 = $this->getObject()->male;
-        $person_2 = $this->getObject()->female;
+        $person_1 = $this->getObject()->male ?? null;
+        $person_2 = $this->getObject()->female ?? null;
         if ($person_1 && !$person_2) {
           $message = 'Een huwelijk van ' . $person_1->name;
         } elseif (!$person_1 && $person_2) {

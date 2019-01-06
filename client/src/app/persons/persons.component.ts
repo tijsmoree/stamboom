@@ -4,7 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { Person } from '../all.model';
+import { Person, Location, Marriage } from '../all.model';
 import { NotifierService } from 'angular-notifier';
 import { NgForm } from '@angular/forms';
 import { UtilsService } from '../utils.service';
@@ -24,6 +24,8 @@ export class PersonsComponent implements OnInit, OnDestroy {
 
   subTitle: string;
 
+  locations: Location[];
+
   private unsubscribeAll: Subject<any>;
 
   constructor (
@@ -41,6 +43,12 @@ export class PersonsComponent implements OnInit, OnDestroy {
     this.http.get('/api/persons').subscribe(
       (data: Person[]): void => {
         this.people = data;
+      }
+    );
+
+    this.http.get('/api/locations').subscribe(
+      (data: Location[]): void => {
+        this.locations = data;
       }
     );
 
@@ -96,6 +104,9 @@ export class PersonsComponent implements OnInit, OnDestroy {
         this.person = data;
         this.titleService.setTitle(data ? this.utils.name(data) : 'Personen');
         this.subTitle = this.utils.name(data);
+        if (data.birth && data.birth.date) {
+          this.subTitle += ' (' + this.utils.age(data) + ')';
+        }
       },
       (): void => {
         this.subTitle = null;
@@ -122,6 +133,10 @@ export class PersonsComponent implements OnInit, OnDestroy {
         this.form.control.markAsPristine();
         this.notifier.notify('success', 'Wijzigingen opgeslagen.');
         this.person = data;
+        this.subTitle = this.utils.name(data);
+        if (data.birth && data.birth.date) {
+          this.subTitle += ' (' + this.utils.age(data) + ')';
+        }
         this.router.navigate([`person/${data.id}`]);
       }
     );
@@ -145,5 +160,9 @@ export class PersonsComponent implements OnInit, OnDestroy {
         }
       }
     );
+  }
+
+  marriageDelete = (id: number): void => {
+    this.person.marriages = this.person.marriages.filter((m: Marriage) => m.id !== id);
   }
 }

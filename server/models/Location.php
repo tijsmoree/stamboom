@@ -53,11 +53,13 @@ class Location extends ActiveRecord {
   }
 
   public function getViewAttributes() {
-    $this->getAttributes([
+    return $this->getAttributes([
       'id',
       'name',
       'state',
-      'country'
+      'country',
+      'longitude',
+      'latitude'
     ]);
   }
 }

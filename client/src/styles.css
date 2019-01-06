@@ -29,4 +29,10 @@ td {
 textarea {
   margin: -1px !important;
   width: inherit !important;
-} 
+}
+
+.btn-xs {
+  padding: .1rem .4rem !important;
+  font-size: .8rem !important;
+  line-height: 1.5 !important;
+}

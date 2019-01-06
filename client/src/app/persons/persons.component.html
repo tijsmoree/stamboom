@@ -37,34 +37,47 @@
 
   <div class="container" *ngIf="person">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="card mb-4">
           <div class="card-header">
             Persoon
           </div>
           <table class="table">
             <tbody>
-            <tr>
-              <td style="border: 0;"><label>Naam</label></td>
-              <td style="border: 0;"><input type='text' [(ngModel)]='person.name' name='name' class='form-control'/></td>
-            </tr>
-            <tr>
-              <td><label>Geslacht</label></td>
-              <td>
-                <div class="row">
-                  <div class="col-6">
-                    <label class="radio-inline">
-                      <input type="radio" [(ngModel)]='person.is_man' name='is_man' [value]="1"> Man
-                    </label>
+              <tr>
+                <td style="border: 0;"><label>Voornaam</label></td>
+                <td style="border: 0;"><input type='text' [(ngModel)]='person.first_name' name='first_name' class='form-control'/></td>
+              </tr>
+              <tr>
+                <td><label>Roepnaam</label></td>
+                <td><input type='text' [(ngModel)]='person.nickname' name='nickname' class='form-control'/></td>
+              </tr>
+              <tr>
+                <td><label>Achternaam</label></td>
+                <td><input type='text' [(ngModel)]='person.last_name' name='last_name' class='form-control'/></td>
+              </tr>
+              <tr>
+                <td><label>Geslacht</label></td>
+                <td>
+                  <div class="row">
+                    <div class="col-4">
+                      <label class="radio-inline">
+                        <input type="radio" [(ngModel)]='person.sex' name='sex' value="m">&nbsp;<span class="fa fa-mars"></span>
+                      </label>
+                    </div>
+                    <div class="col-4">
+                      <label class="radio-inline">
+                        <input type="radio" [(ngModel)]='person.sex' name='sex' value="f">&nbsp;<span class="fa fa-venus"></span>
+                      </label>
+                    </div>
+                    <div class="col-4">
+                      <label class="radio-inline">
+                        <input type="radio" [(ngModel)]='person.sex' name='sex' value="u">&nbsp;<span class="fa fa-genderless"></span>
+                      </label>
+                    </div>
                   </div>
-                  <div class="col-6">
-                    <label class="radio-inline">
-                      <input type="radio" [(ngModel)]='person.is_man' name='is_man' [value]="0"> Vrouw
-                    </label>
-                  </div>
-                </div>
-              </td>
-            </tr>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -74,6 +87,177 @@
             Commentaar
           </div>
           <textarea class="form-control form-comments" [(ngModel)]="person.comments" name="comments"></textarea>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-header">
+            <button class="float-right btn btn-xs btn-outline-secondary" *ngIf="!person.birth" (click)="person.birth = {}; form.control.markAsDirty()">
+              <span class="fa fa-plus"></span>
+            </button>
+            <button class="float-right btn btn-xs btn-outline-secondary" *ngIf="person.birth" (click)="person.birth = null; form.control.markAsDirty()">
+              <span class="fa fa-times"></span>
+            </button>
+            Geboorte
+          </div>
+          <table class="table" *ngIf="person.birth">
+            <tbody>
+              <tr>
+                <td style="border: 0;"><label>Datum</label></td>
+                <td style="border: 0;"><input type='date' [(ngModel)]='person.birth.date' name='birth_date' class='form-control'/></td>
+              </tr>
+              <tr>
+                <td><label>Locatie</label></td>
+                <td>
+                  <ng-select [items]="locations"
+                    *ngIf="locations"
+                    [(ngModel)]="person.birth.location"
+                    name="birth_location"
+                    bindLabel="name"
+                    placeholder="Locatie"
+                    class="small-select">
+                  </ng-select>
+                </td>
+              </tr>
+              <tr>
+                <td><label>Bron</label></td>
+                <td><textarea [(ngModel)]='person.birth.source' name='birth_source' class='form-control' style="width: 100% !important"></textarea></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card mb-4" *ngFor="let marriage of person.marriages">
+          <div class="card-header">
+            <button class="float-right btn btn-xs btn-outline-secondary" (click)="marriageDelete(marriage.id); form.control.markAsDirty()" style="margin-left: -1px">
+              <span class="fa fa-times"></span>
+            </button>
+            <button class="float-right btn btn-xs btn-outline-secondary" *ngIf="!marriage.divorce" (click)="marriage.divorce = {}; form.control.markAsDirty()">
+              <span class="fa fa-link"></span>
+            </button>
+            <button class="float-right btn btn-xs btn-outline-secondary" *ngIf="marriage.divorce" (click)="marriage.divorce = null; form.control.markAsDirty()">
+              <span class="fa fa-unlink"></span>
+            </button>
+            Huwelijk
+          </div>
+          <table class="table">
+            <tbody>
+              <tr>
+                <td style="border: 0;"><label>Partner</label></td>
+                <td style="border: 0;">
+                  <ng-select [items]="people"
+                    *ngIf="people"
+                    [(ngModel)]="marriage.spouse"
+                    name="marriage_spouse"
+                    placeholder="Partner"
+                    class="small-select">
+                    <ng-template ng-label-tmp let-item="item">
+                      {{utils.simpleName(item)}}
+                    </ng-template>
+                    <ng-template ng-option-tmp let-item="item">
+                      {{utils.simpleName(item)}}
+                    </ng-template>
+                  </ng-select>
+                </td>
+              </tr>
+              <tr>
+                <td><label>Datum</label></td>
+                <td><input type='date' [(ngModel)]='marriage.marriage.date' name='marriage_date' class='form-control'/></td>
+              </tr>
+              <tr>
+                <td><label>Locatie</label></td>
+                <td>
+                  <ng-select [items]="locations"
+                    *ngIf="locations"
+                    [(ngModel)]="marriage.marriage.location"
+                    name="marriage_location"
+                    bindLabel="name"
+                    placeholder="Locatie"
+                    class="small-select">
+                  </ng-select>
+                </td>
+              </tr>
+              <tr>
+                <td><label>Bron</label></td>
+                <td><textarea [(ngModel)]='marriage.marriage.source' name='marriage_source' class='form-control' style="width: 100% !important"></textarea></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="card-header" *ngIf="marriage.divorce" style="border-bottom: none; border-top: 1px solid rgba(0,0,0,.125);">
+            Scheiding
+          </div>
+          <table class="table" *ngIf="marriage.divorce">
+            <tbody>
+              <tr>
+                <td><label>Datum</label></td>
+                <td><input type='date' [(ngModel)]='marriage.divorce.date' name='divorce_date' class='form-control'/></td>
+              </tr>
+              <tr>
+                <td><label>Locatie</label></td>
+                <td>
+                  <ng-select [items]="locations"
+                    *ngIf="locations"
+                    [(ngModel)]="marriage.divorce.location"
+                    name="divorce_location"
+                    bindLabel="name"
+                    placeholder="Locatie"
+                    class="small-select">
+                  </ng-select>
+                </td>
+              </tr>
+              <tr>
+                <td><label>Bron</label></td>
+                <td><textarea [(ngModel)]='marriage.divorce.source' name='divorce_source' class='form-control' style="width: 100% !important"></textarea></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <button class="float-right btn btn-xs btn-outline-secondary" (click)="person.marriages.push({}); form.control.markAsDirty()">
+              <span class="fa fa-plus"></span>
+            </button>
+            Huwelijk
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <button class="float-right btn btn-xs btn-outline-secondary" *ngIf="!person.death" (click)="person.death = {}; form.control.markAsDirty()">
+              <span class="fa fa-plus"></span>
+            </button>
+            <button class="float-right btn btn-xs btn-outline-secondary" *ngIf="person.death" (click)="person.death = null; form.control.markAsDirty()">
+              <span class="fa fa-times"></span>
+            </button>
+            Overlijden
+          </div>
+          <table class="table" *ngIf="person.death">
+            <tbody>
+              <tr>
+                <td style="border: 0;"><label>Datum</label></td>
+                <td style="border: 0;"><input type='date' [(ngModel)]='person.death.date' name='death_date' class='form-control'/></td>
+              </tr>
+              <tr>
+                <td><label>Locatie</label></td>
+                <td>
+                  <ng-select [items]="locations"
+                    *ngIf="locations"
+                    [(ngModel)]="person.death.location"
+                    name="death_location"
+                    bindLabel="name"
+                    placeholder="Locatie"
+                    class="small-select">
+                  </ng-select>
+                </td>
+              </tr>
+              <tr>
+                <td><label>Bron</label></td>
+                <td><textarea [(ngModel)]='person.death.source' name='death_source' class='form-control' style="width: 100% !important"></textarea></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

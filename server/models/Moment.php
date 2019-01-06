@@ -37,15 +37,19 @@ class Moment extends ActiveRecord {
 
   public function beforeSave($insert) {
     $this->source = $this->source ?? '';
-    
+
     return parent::beforeSave($insert);
   }
 
   public function rules() {
     return [
       [['source'], 'string'],
-      [['date'], 'date']
+      [['date'], 'date', 'format' => 'php:Y-m-d']
     ];
+  }
+
+  public function getLocation() {
+    return $this->hasOne(Location::className(), ['id' => 'location_id']);
   }
 
   public function getOwner() {
